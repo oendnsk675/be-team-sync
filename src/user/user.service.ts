@@ -13,15 +13,26 @@ export class UserService {
   }
 
   async findAll(): Promise<any> {
-    return await this.userRepository.find();
+    const users = await this.userRepository.find();
+    return {
+      message: 'Successfull retrieve data users',
+      data: users,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async findOne(user_id: number) {
+    const user = await this.userRepository.findOne({ where: { user_id } });
+    return {
+      message: 'Successfull retrieve data user',
+      data: user,
+    };
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} auth`;
+  async update(user_id: number, updateUserDto: UpdateUserDto) {
+    await this.userRepository.update({ user_id }, updateUserDto);
+    return {
+      message: 'Successfull update data user',
+    };
   }
 
   remove(id: number) {
