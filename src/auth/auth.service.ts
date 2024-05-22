@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserRepository } from 'src/user/user.repository';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { SignupResponseDto } from './dto/signup-response.dto';
@@ -63,21 +62,5 @@ export class AuthService {
       message: 'Signin successful',
       data,
     };
-  }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
   }
 }
