@@ -1,9 +1,11 @@
+import { UserTeam } from 'src/user_team/entities/user_team.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -28,6 +30,9 @@ export class User {
 
   @Column({ length: 255 })
   role: string;
+
+  @OneToMany(() => UserTeam, (userTeam) => userTeam.user)
+  userTeams: UserTeam[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

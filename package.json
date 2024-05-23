@@ -19,11 +19,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "migration:run": "npm run typeorm migration:run -- -d ./src/config/typeorm.ts",
+    "db:migrate": "npm run typeorm migration:run -- -d ./src/config/typeorm.ts",
     "migration:generate": "npm run typeorm -- -d ./src/config/typeorm.ts migration:generate ./src/migrations/%npm_config_name%",
     "migration:create": "npm run typeorm -- migration:create ./src/migrations/%npm_config_name%",
     "migration:revert": "npm run typeorm -- -d ./src/config/typeorm.ts migration:revert",
-    "db:refresh": "npm run migration:revert && npm run migration:run",
+    "db:refresh": "npm run migration:revert && npm run db:migrate",
     "send": "echo send email to %npm_config_name%"
   },
   "dependencies": {

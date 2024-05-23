@@ -13,13 +13,18 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((response) => {
         const message = response?.message || 'Request successful';
-        const data = response?.data !== undefined ? response.data : response;
+        const data = response?.data !== undefined ? response.data : undefined;
 
-        return {
+        const result = {
           statusCode: context.switchToHttp().getResponse().statusCode,
           message,
-          data,
         };
+
+        if (data !== undefined) {
+          result['data'] = data;
+        }
+
+        return result;
       }),
     );
   }

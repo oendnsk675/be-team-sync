@@ -1,26 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { CreateResponse } from './dto/create-response.dto';
+import { TeamRepository } from './team.repository';
+import { GetAllResponse } from './dto/get-all-response.dto';
+import { Team } from './entities/team.entity';
 
 @Injectable()
 export class TeamService {
-  create(createTeamDto: CreateTeamDto) {
-    return 'This action adds a new team';
+  constructor(private readonly teamRepository: TeamRepository) {}
+
+  async create(createTeamDto: CreateTeamDto): Promise<CreateResponse> {
+    const team = await this.teamRepository.createTeam(createTeamDto);
+
+    return {
+      message: 'Successfully create the team',
+      data: team,
+    };
   }
 
-  findAll() {
-    return `This action returns all team`;
+  async findAll(): Promise<GetAllResponse> {
+    const teams: Team[] = await this.teamRepository.find();
+    return {
+      message: 'Successfull retrieve data teams',
+      data: teams,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} team`;
+  async findOne(id: number) {
+    const team = await this.teamRepository.findTeam(id);
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+    return {
+      message: 'Successfull retrieve data team',
+      data: team,
+    };
   }
 
-  update(id: number, updateTeamDto: UpdateTeamDto) {
-    return `This action updates a #${id} team`;
+  async update(id: number, updateTeamDto: UpdateTeamDto) {
+    await this.teamRepository.update(id, updateTeamDto);
+    return {
+      message: 'Successfull update data team',
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} team`;
+  async remove(team_id: number) {
+    await this.teamRepository.delete({ team_id });
+
+    return {
+      message: 'Successfull update data team',
+    };
   }
 }
