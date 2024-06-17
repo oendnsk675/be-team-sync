@@ -48,7 +48,7 @@ export class AuthService {
       throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    const payload = { id_user: user.user_id };
+    const payload = { user_id: user.user_id };
     const data = {
       access_token: this.jwtService.sign(payload, {
         expiresIn: process.env.JWT_EXPIRED,
