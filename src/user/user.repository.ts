@@ -17,6 +17,6 @@ export class UserRepository extends Repository<User> {
   }
 
   async getUser(data: string) {
-    return this.userRepository.findOne({ where: { email: data } });
+    return this.userRepository.findOne({ where: { username: data } });
   }
 }

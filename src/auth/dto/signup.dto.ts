@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsUrl, IsEnum, IsInt } from 'class-validator';
+import { IsEmail, IsString, IsInt } from 'class-validator';
 
 export class ResponseSignupDto {
   @IsString()
@@ -12,12 +12,6 @@ export class ResponseSignupDto {
 
   @IsString()
   fullname: string;
-
-  @IsUrl()
-  avatar: string;
-
-  @IsEnum(['user', 'admin'])
-  role: string;
 
   @IsInt()
   user_id: number;

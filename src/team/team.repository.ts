@@ -17,11 +17,6 @@ export class TeamRepository extends Repository<Team> {
     );
   }
 
-  async createTeam(createTeamDto: CreateTeamDto) {
-    const user = this.teamRepository.create(createTeamDto);
-    return await this.teamRepository.save(user);
-  }
-
   async findTeam(team_id: number): Promise<Team> {
     return await this.createQueryBuilder('team')
       .leftJoinAndSelect('team.userTeams', 'userTeam')

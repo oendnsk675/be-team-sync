@@ -35,6 +35,14 @@ export class UserService {
     };
   }
 
+  async findByUsername(username: string) {
+    return await this.userRepository.findOne({ where: { username } });
+  }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   remove(id: number) {
     return `This action removes a #${id} auth`;
   }
