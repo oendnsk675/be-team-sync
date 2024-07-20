@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,12 +7,13 @@ import { TeamModule } from './team/team.module';
 import { UserTeamModule } from './user_team/user_team.module';
 import { TaskModule } from './task/task.module';
 import { ProjectModule } from './project/project.module';
+import { ChatModule } from './chat/chat.module';
 import typeorm from './config/typeorm';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env.development',
+      envFilePath: '.env.development.local',
       isGlobal: true,
       load: [typeorm],
     }),
@@ -29,8 +28,7 @@ import typeorm from './config/typeorm';
     UserTeamModule,
     TaskModule,
     ProjectModule,
+    ChatModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

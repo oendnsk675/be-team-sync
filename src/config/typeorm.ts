@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
-dotenvConfig({ path: '.env.development' });
+dotenvConfig({ path: '.env.development.local' });
 
 const config = {
   type: 'postgres',

@@ -21,6 +21,8 @@ export class AuthService {
   }
 
   async signUp(createAuthDto: CreateUserDto): Promise<SignupResponseDto> {
+    console.log(createAuthDto.password);
+
     const hashedPassword = await this.hashPassword(createAuthDto.password);
     const data = {
       ...createAuthDto,
@@ -35,7 +37,9 @@ export class AuthService {
   }
 
   async signIn(createAuthDto: SignInDto): Promise<SignInResponseDto> {
-    const user = await this.userRepository.getUser(createAuthDto.email);
+    const user = await this.userRepository.getUser(createAuthDto.username);
+    console.log(user);
+
     if (!user) {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
@@ -44,11 +48,12 @@ export class AuthService {
       createAuthDto.password,
       user.password,
     );
+
     if (!userValid) {
       throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    const payload = { id_user: user.user_id };
+    const payload = { user_id: user.user_id };
     const data = {
       access_token: this.jwtService.sign(payload, {
         expiresIn: process.env.JWT_EXPIRED,
@@ -59,6 +64,7 @@ export class AuthService {
     };
 
     return {
+      statusCode: 200,
       message: 'Signin successful',
       data,
     };

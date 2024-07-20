@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -13,7 +15,9 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { CreateUserTeamDto } from 'src/user_team/dto/create-user_team.dto';
 import { UserTeamService } from 'src/user_team/user_team.service';
 import { RemoveUserTeamDto } from 'src/user_team/dto/remove-user_team.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('team')
 export class TeamController {
   constructor(
@@ -22,8 +26,8 @@ export class TeamController {
   ) {}
 
   @Post()
-  create(@Body() createTeamDto: CreateTeamDto) {
-    return this.teamService.create(createTeamDto);
+  create(@Body() createTeamDto: CreateTeamDto, @Request() req) {
+    return this.teamService.create(createTeamDto, req.user.user_id);
   }
 
   @Post('user/invite')
@@ -34,6 +38,16 @@ export class TeamController {
   @Post('user/remove')
   removeUser(@Body() payload: RemoveUserTeamDto) {
     return this.userTeamService.remove(payload);
+  }
+
+  @Get('count')
+  getTotalTeam(@Request() req) {
+    return this.teamService.getTotalTeam(req.user.user_id);
+  }
+
+  @Get('member/count')
+  getTotalTeamMember(@Request() req) {
+    return this.teamService.getTotalTeamMember(req.user.user_id);
   }
 
   @Get(':id')
