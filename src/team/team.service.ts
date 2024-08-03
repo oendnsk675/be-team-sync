@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { CreateResponse } from './dto/create-response.dto';
 import { TeamRepository } from './team.repository';
 import { GetAllResponse } from './dto/get-all-response.dto';
 import { Team } from './entities/team.entity';
@@ -48,12 +47,58 @@ export class TeamService {
     );
   }
 
-  async findAll(): Promise<GetAllResponse> {
-    const teams: Team[] = await this.teamRepository.find();
-    return {
-      message: 'Successfull retrieve data teams',
-      data: teams,
-    };
+  async findAll(page: number = 1, limit: number = 10): Promise<GetAllResponse> {
+    try {
+      const offset = (page - 1) * limit;
+
+      // Query data dengan pagination
+      const [teams, total] = await this.teamRepository.findAndCount({
+        skip: offset,
+        take: limit,
+      });
+
+      return {
+        message: 'Successfully retrieved data teams',
+        data: {
+          data: teams,
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      throw new BadGatewayException();
+    }
+  }
+
+  async findAllMember(
+    team_id: number,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    try {
+      const offset = (page - 1) * limit;
+
+      const [users, total] = await this.userTeamRepository.findAndCount({
+        where: { team_id },
+        relations: ['user'],
+        skip: offset,
+        take: limit,
+      });
+      return {
+        message: 'Successfully retrieved data members',
+        data: {
+          data: users,
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      throw new BadGatewayException();
+    }
   }
 
   async findOne(id: number) {
@@ -99,25 +144,51 @@ export class TeamService {
     }
   }
 
-  async getTotalTeamMember(userId: number) {
+  async getTotalMember(userId: number, teamId: number) {
     try {
-      const teams = await this.userTeamRepository.find({
+      const total = await this.userTeamRepository.count({
         where: {
           user_id: userId,
+          team_id: teamId,
           role: In([UserRole.AUTHOR, UserRole.MAINTENER]),
         },
       });
 
-      const filterMember = teams.filter((team) => team.user_id !== userId);
-      const totalMember = filterMember.length;
-
       return {
-        message: 'Successfully retrieve the total team',
+        message: 'Successfullys retrieve the total team',
         data: {
-          total: totalMember,
+          total,
         },
       };
     } catch (error) {
+      throw new BadGatewayException();
+    }
+  }
+
+  async getTotalUserActive(team_id: number) {
+    try {
+      // tinggal ambil semua user yg aktif berdasarkan team
+      const totalUserActive = await this.userTeamRepository
+        .createQueryBuilder('user_teams')
+        .innerJoin('user_teams.user', 'users')
+        .where('user_teams.team_id = :team_id', { team_id })
+        .andWhere('users.status = :status', { status: true })
+        .getCount();
+
+      const totalUser = await this.userTeamRepository.count({
+        where: { team_id },
+      });
+
+      return {
+        message: 'Succesfully retrieve total user active.',
+        data: {
+          totalUserActive,
+          totalUser,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+
       throw new BadGatewayException();
     }
   }

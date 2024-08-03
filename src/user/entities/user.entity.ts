@@ -1,3 +1,4 @@
+import { Task } from 'src/task/entities/task.entity';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
 import {
   Column,
@@ -6,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -31,6 +33,9 @@ export class User {
   @Column({ length: 255 })
   role: string;
 
+  @Column({ default: false })
+  status: boolean;
+
   @OneToMany(() => UserTeam, (userTeam) => userTeam.user)
   userTeams: UserTeam[];
 
@@ -39,4 +44,7 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @ManyToMany(() => Task, (task) => task.assignees)
+  tasks: Task[];
 }

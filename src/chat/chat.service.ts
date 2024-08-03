@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserTeamRepository } from 'src/user_team/user_team.repository';
 import { Repository } from 'typeorm';
@@ -17,9 +17,15 @@ export class ChatService {
     return await this.repository.find({ where: { user_id } });
   }
 
-  async saveMessage(payload: CreateMessageDto): Promise<Chat> {
-    const message = this.chatRepository.create(payload);
-    return await this.chatRepository.save(message);
+  async saveMessage(payload: CreateMessageDto) {
+    try {
+      const message = this.chatRepository.create(payload);
+      return await this.chatRepository.save(message);
+    } catch (error) {
+      console.log(error);
+
+      throw new BadGatewayException();
+    }
   }
 
   async findAll(team_id: number, page: number, limit: number) {
@@ -29,7 +35,7 @@ export class ChatService {
       skip: (page - 1) * limit,
       take: limit,
       order: {
-        chat_id: 'ASC',
+        createdAt: 'DESC',
       },
     });
 

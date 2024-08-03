@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { AuthMiddleware } from './auth.middleware';
 import { UserService } from 'src/user/user.service';
+import { UserTeam } from 'src/user_team/entities/user_team.entity';
+import { UserTeamRepository } from 'src/user_team/user_team.repository';
 
 @Module({
   imports: [
@@ -18,10 +20,10 @@ import { UserService } from 'src/user/user.service';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_EXPIRED },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, UserTeam]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UserService],
+  providers: [AuthService, JwtStrategy, UserService, UserTeamRepository],
 })
 export class AuthModule {
   configure(consumer: MiddlewareConsumer) {

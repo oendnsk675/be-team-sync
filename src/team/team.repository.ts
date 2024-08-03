@@ -2,7 +2,6 @@ import { Repository } from 'typeorm';
 import { Team } from './entities/team.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateTeamDto } from './dto/create-team.dto';
 
 @Injectable()
 export class TeamRepository extends Repository<Team> {

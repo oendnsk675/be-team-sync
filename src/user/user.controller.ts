@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -43,8 +44,16 @@ export class UserController {
 export class UsersController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Get('')
+  findAll(@Query('query') query: string) {
+    return this.userService.findAll(query);
+  }
+
+  @Get(':team_id')
+  findAllUserForInvite(
+    @Query('query') query: string,
+    @Param('team_id') team_id: string,
+  ) {
+    return this.userService.findAllUserForInvite(+team_id, query);
   }
 }

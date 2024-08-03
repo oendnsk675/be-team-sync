@@ -8,11 +8,12 @@ import {
   Delete,
   Request,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { CreateUserTeamDto } from 'src/user_team/dto/create-user_team.dto';
+import { CreateUserTeamsDto } from 'src/user_team/dto/create-user_team.dto';
 import { UserTeamService } from 'src/user_team/user_team.service';
 import { RemoveUserTeamDto } from 'src/user_team/dto/remove-user_team.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -30,12 +31,12 @@ export class TeamController {
     return this.teamService.create(createTeamDto, req.user.user_id);
   }
 
-  @Post('user/invite')
-  invite(@Body() payload: CreateUserTeamDto) {
+  @Post('member/invite')
+  invite(@Body() payload: CreateUserTeamsDto) {
     return this.userTeamService.create(payload);
   }
 
-  @Post('user/remove')
+  @Post('member/suspend')
   removeUser(@Body() payload: RemoveUserTeamDto) {
     return this.userTeamService.remove(payload);
   }
@@ -45,9 +46,23 @@ export class TeamController {
     return this.teamService.getTotalTeam(req.user.user_id);
   }
 
-  @Get('member/count')
-  getTotalTeamMember(@Request() req) {
-    return this.teamService.getTotalTeamMember(req.user.user_id);
+  @Get('members/:team_id')
+  getTeamMembers(
+    @Param('team_id') team_id: number,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.teamService.findAllMember(team_id, page, limit);
+  }
+
+  @Get(':teamId/member/count')
+  getTotalMember(@Request() req, @Param('teamId') teamId: string) {
+    return this.teamService.getTotalMember(req.user.user_id, +teamId);
+  }
+
+  @Get('user/active')
+  getTotalUserActive(@Query('team_id') team_id: string) {
+    return this.teamService.getTotalUserActive(+team_id);
   }
 
   @Get(':id')
@@ -71,7 +86,7 @@ export class TeamsController {
   constructor(private readonly teamService: TeamService) {}
 
   @Get()
-  findAll() {
-    return this.teamService.findAll();
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.teamService.findAll(page, limit);
   }
 }

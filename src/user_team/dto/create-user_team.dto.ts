@@ -1,10 +1,20 @@
-import { IsInt, IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsNotEmpty,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 
-export class CreateUserTeamDto {
-  @IsInt()
+class CreateUserTeamDto {
+  @IsNumber()
+  @IsNotEmpty()
   user_id: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsNotEmpty()
   team_id: number;
 
   @IsString()
@@ -12,4 +22,11 @@ export class CreateUserTeamDto {
 
   @IsOptional()
   joined_at?: Date;
+}
+
+export class CreateUserTeamsDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateUserTeamDto)
+  teams: CreateUserTeamDto[];
 }

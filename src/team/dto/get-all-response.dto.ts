@@ -1,9 +1,12 @@
-import { IsString } from 'class-validator';
 import { Team } from '../entities/team.entity';
 
 export class GetAllResponse {
-  @IsString()
   message: string;
-
-  data: Team[];
+  data: {
+    data: Team[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }

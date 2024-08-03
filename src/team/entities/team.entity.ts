@@ -1,3 +1,4 @@
+import { Task } from 'src/task/entities/task.entity';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
 import {
   Entity,
@@ -21,6 +22,9 @@ export class Team {
 
   @OneToMany(() => UserTeam, (userTeam) => userTeam.team)
   userTeams: UserTeam[];
+
+  @OneToMany(() => Task, (task) => task.taskId)
+  tasks: Task[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

@@ -1,19 +1,20 @@
 import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import { Chat } from '../entities/chat.entity';
 
 export class CreateMessageDto {
   @IsNotEmpty()
   @IsNumber()
-  userId: number;
+  user_id: number;
 
   @IsNotEmpty()
   @IsNumber()
-  teamId: number;
+  team_id: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   message: string;
 
   @IsOptional()
   @IsNumber()
-  replyToId?: number;
+  reply_to?: Chat;
 }

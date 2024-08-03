@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Team } from 'src/team/entities/team.entity';
@@ -35,4 +36,7 @@ export class Chat {
   })
   @JoinColumn({ name: 'team_id' })
   team: Team;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
+  createdAt: Date;
 }

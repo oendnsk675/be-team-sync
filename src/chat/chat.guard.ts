@@ -1,13 +1,9 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import * as jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
+import extract from 'src/common/utils/extract.token';
 
 @Injectable()
 export class ChatGuard implements CanActivate {
@@ -18,17 +14,17 @@ export class ChatGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const client = context.switchToWs().getClient();
 
-    const authToken = client.handshake.headers.token;
+    const token = extract(client);
 
-    if (!authToken) {
+    if (!token) {
       return false;
     }
 
     try {
-      const decoded = jwt.verify(authToken, 'team-sync') as any;
+      const decoded = jwt.verify(token, 'team-sync') as any;
 
       return new Promise((resolve, reject) => {
-        return this.userService.findOne(decoded.username).then((user) => {
+        return this.userService.findOne(decoded.user_id).then((user) => {
           if (user) {
             client.data.user = user.data;
             resolve(true);

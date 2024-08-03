@@ -19,6 +19,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { ChatGuard } from './chat.guard';
 import { CreateMessageDto } from './dto/create.dto';
+import extract from 'src/common/utils/extract.token';
 
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -37,14 +38,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
-      const token = client.handshake.headers.token;
-      const actualToken = Array.isArray(token) ? token[0] : token;
+      const token = extract(client);
 
-      if (!actualToken) {
+      if (!token) {
         throw new UnauthorizedException('Token not provided');
       }
 
-      const jwtPayload = this.jwtService.verify(actualToken, {
+      const jwtPayload = this.jwtService.verify(token, {
         publicKey: 'team-sync',
       });
       const user = await this.userService.findOne(jwtPayload.user_id);
@@ -61,14 +61,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.join(`team_${team.team_id}`);
         console.log(`Client ${client.id} joined room team_${team.team_id}`);
       });
+
+      await this.userService.updateStatus(user.data.user_id, true);
     } catch (error) {
-      console.error('Connection error:', error.message);
+      console.error('Connection error:', error);
       client.disconnect();
     }
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    const token = extract(client);
+    const jwtPayload = this.jwtService.verify(token, {
+      publicKey: 'team-sync',
+    });
+    console.log(`Client disconnected: ${jwtPayload.user_id}`);
+
+    await this.userService.updateStatus(jwtPayload.user_id, false);
   }
 
   @UseGuards(ChatGuard)
@@ -77,10 +85,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: CreateMessageDto,
   ) {
+    const data = {
+      user_id: client.data.user.user_id,
+      ...payload,
+    };
+
     // // Save message to the database
-    await this.chatService.saveMessage(payload);
+    await this.chatService.saveMessage(data);
 
     // // Emit message to the specific team room
-    this.server.to(`team_${payload.teamId}`).emit('message', payload);
+    this.server.to(`team_${payload.team_id}`).emit('message', payload);
   }
 }

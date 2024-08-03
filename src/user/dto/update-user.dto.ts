@@ -1,4 +1,10 @@
-import { IsString, IsEmail, IsOptional, Length } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  Length,
+  IsBoolean,
+} from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -30,4 +36,8 @@ export class UpdateUserDto {
   @IsString()
   @Length(1, 255)
   role?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  status?: boolean;
 }

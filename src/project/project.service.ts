@@ -1,20 +1,43 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TeamRepository } from 'src/team/team.repository';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    private readonly teamRepository: TeamRepository,
   ) {}
 
   async create(createProjectDto: CreateProjectDto) {
     try {
-      await this.projectRepository.save(createProjectDto);
+      const { teamId, ...projectData } = createProjectDto;
+
+      // Dapatkan entitas Team berdasarkan teamId
+      const team = await this.teamRepository.findOne({
+        where: { team_id: teamId },
+      });
+
+      if (!team) {
+        throw new BadRequestException('Team not found');
+      }
+
+      const payload = this.projectRepository.create({
+        ...projectData,
+        team,
+      });
+
+      await this.projectRepository.save(payload);
 
       return {
         message: 'Successfully create project',
@@ -31,15 +54,15 @@ export class ProjectService {
       .innerJoin('team.userTeams', 'userTeam')
       .where('userTeam.user_id = :userId', { userId })
       .select([
-        'project.projectId',
-        'project.projectName',
+        'project.project_id',
+        'project.project_name',
         'project.description',
         'project.startDate',
         'project.endDate',
         'project.createdAt',
         'project.updatedAt',
-        'team.teamId',
-        'team.teamName',
+        'team.team_id',
+        'team.team_name',
       ])
       .getMany();
 
@@ -53,11 +76,30 @@ export class ProjectService {
     return `This action returns a #${id} project`;
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async update(id: number, updateProjectDto: UpdateProjectDto) {
+    try {
+      const { affected } = await this.projectRepository.update(
+        id,
+        updateProjectDto,
+      );
+      if (affected <= 0) {
+        throw new BadRequestException();
+      }
+
+      return {
+        message: 'Successfully update the project',
+      };
+    } catch (error) {
+      console.log(error);
+
+      throw new BadGatewayException();
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async remove(id: number) {
+    await this.projectRepository.delete(id);
+    return {
+      message: 'Succesfully remove the project!',
+    };
   }
 }

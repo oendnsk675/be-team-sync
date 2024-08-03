@@ -7,9 +7,10 @@ import { TeamRepository } from './team.repository';
 import { UserTeamModule } from 'src/user_team/user_team.module';
 import { UserTeamRepository } from 'src/user_team/user_team.repository';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
+import { Task } from 'src/task/entities/task.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Team, UserTeam]), UserTeamModule],
+  imports: [TypeOrmModule.forFeature([Team, UserTeam, Task]), UserTeamModule],
   controllers: [TeamController, TeamsController],
   providers: [TeamService, TeamRepository, UserTeamRepository],
 })

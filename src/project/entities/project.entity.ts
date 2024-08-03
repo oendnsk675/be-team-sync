@@ -11,11 +11,11 @@ import {
 
 @Entity('projects')
 export class Project {
-  @PrimaryGeneratedColumn({ name: 'project_id' })
-  projectId: number;
+  @PrimaryGeneratedColumn()
+  project_id: number;
 
-  @Column({ name: 'project_name', type: 'varchar', length: 255 })
-  projectName: string;
+  @Column({ type: 'varchar', length: 255 })
+  project_name: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
@@ -24,7 +24,7 @@ export class Project {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'team_id' })
-  team: number;
+  team: Team;
 
   @Column({ name: 'start_date', type: 'date', nullable: true })
   startDate: Date;
