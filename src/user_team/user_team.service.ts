@@ -11,6 +11,7 @@ export class UserTeamService {
     try {
       return await this.repository.createUserTeam(payload);
     } catch (error) {
+      console.log(error);
       throw new BadRequestException();
     }
   }

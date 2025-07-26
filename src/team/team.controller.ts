@@ -9,6 +9,8 @@ import {
   Request,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -17,6 +19,9 @@ import { CreateUserTeamsDto } from 'src/user_team/dto/create-user_team.dto';
 import { UserTeamService } from 'src/user_team/user_team.service';
 import { RemoveUserTeamDto } from 'src/user_team/dto/remove-user_team.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @UseGuards(JwtAuthGuard)
 @Controller('team')
@@ -68,6 +73,33 @@ export class TeamController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teamService.findOne(+id);
+  }
+
+  @Patch('image/:team_id')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/teams/images',
+        filename: (req, file, cb) => {
+          // Menggunakan ID pengguna sebagai nama file untuk memastikan tidak ada duplikat
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${req.user.user_id}-${uniqueSuffix}${ext}`;
+
+          cb(null, filename);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  updateImageTeam(@Param() team_id: string, @UploadedFile() file: any) {
+    return this.teamService.updateImageTeam(+team_id, file.filename);
   }
 
   @Patch(':id')

@@ -92,6 +92,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // // Save message to the database
     await this.chatService.saveMessage(data);
+    console.log(`Message from ${client.data.user.username}:`, data);
+    
 
     // // Emit message to the specific team room
     this.server.to(`team_${payload.team_id}`).emit('message', payload);

@@ -9,6 +9,8 @@ import { TaskModule } from './task/task.module';
 import { ProjectModule } from './project/project.module';
 import { ChatModule } from './chat/chat.module';
 import typeorm from './config/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -21,6 +23,10 @@ import typeorm from './config/typeorm';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) =>
         configService.get('typeorm'),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     AuthModule,
     UserModule,

@@ -1,3 +1,4 @@
+import { Visibility, StatusProject } from 'src/common/enums/projects';
 import { Team } from 'src/team/entities/team.entity';
 import {
   Entity,
@@ -20,17 +21,17 @@ export class Project {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'enum', default: 'public', enum: ['public', 'private'] })
+  visibility?: Visibility;
+
+  @Column({ type: 'enum', default: 'open', enum: ['open', 'close'] })
+  status?: StatusProject;
+
   @ManyToOne(() => Team, (team) => team.team_id, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'team_id' })
   team: Team;
-
-  @Column({ name: 'start_date', type: 'date', nullable: true })
-  startDate: Date;
-
-  @Column({ name: 'end_date', type: 'date', nullable: true })
-  endDate: Date;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

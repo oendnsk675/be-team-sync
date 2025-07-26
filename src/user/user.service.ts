@@ -1,4 +1,9 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -33,9 +38,14 @@ export class UserService {
     }
   }
 
-  async findAllUserForInvite(team_id: number, query?: string): Promise<any> {
+  async findAllUserForInvite(
+    team_id: number,
+    user_id: number,
+    query?: string,
+  ): Promise<any> {
     try {
-      const users = await this.userRepository
+      // get data user
+      let users = await this.userRepository
         .createQueryBuilder('user')
         .leftJoin('user.userTeams', 'userTeams')
         .where('userTeams.team_id IS NULL OR userTeams.team_id != :team_id', {
@@ -45,6 +55,22 @@ export class UserService {
         .orWhere('user.fullname LIKE :query', { query: `%${query}%` })
         .orWhere('user.email LIKE :query', { query: `%${query}%` })
         .getMany();
+      users = users.filter((user) => user.user_id !== user_id);
+      // get team user
+      const teams = await this.userTeamRepository.find({
+        where: { team_id },
+        relations: ['user'],
+      });
+
+      // Buat set untuk mempercepat pencarian user yang sudah diundang
+      const invitedUserIds = new Set(teams.map((tu) => tu.user.user_id));
+
+      // Tandai user dengan hasInvited jika mereka sudah join ke team
+      users = users.map((user) => ({
+        ...user,
+        hasInvited: invitedUserIds.has(user.user_id), // Tambahkan flag hasInvited
+      }));
+
       return {
         message: 'Successfully retrieved data members',
         data: users,
@@ -63,10 +89,30 @@ export class UserService {
   }
 
   async update(user_id: number, updateUserDto: UpdateUserDto) {
-    await this.userRepository.update({ user_id }, updateUserDto);
-    return {
-      message: 'Successfull update data user',
-    };
+    try {
+      await this.userRepository.update({ user_id }, updateUserDto);
+      return {
+        message: 'Successfull update data user',
+      };
+    } catch (error) {
+      throw new BadRequestException();
+    }
+  }
+
+  async updateAvatar(userId: number, avatarFilename: string): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update avatar path in the database
+    user.avatar = avatarFilename;
+    await this.userRepository.save(user);
+
+    return { message: 'Avatar updated successfully', data: user.avatar };
   }
 
   async updateStatus(user_id: number, status: boolean) {

@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsEnum } from 'class-validator';
+import { StatusProject, Visibility } from 'src/common/enums/projects';
 
 export class UpdateProjectDto {
   @IsOptional()
@@ -14,10 +15,10 @@ export class UpdateProjectDto {
   teamId: string;
 
   @IsOptional()
-  @IsDate()
-  startDate?: Date;
+  @IsEnum(Visibility)
+  visibility: Visibility;
 
   @IsOptional()
-  @IsDate()
-  endDate?: Date;
+  @IsEnum(StatusProject)
+  status: StatusProject;
 }

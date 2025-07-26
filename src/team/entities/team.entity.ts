@@ -20,6 +20,9 @@ export class Team {
   @Column({ type: 'text' })
   description: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  image: string;
+
   @OneToMany(() => UserTeam, (userTeam) => userTeam.team)
   userTeams: UserTeam[];
 

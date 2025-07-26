@@ -13,6 +13,7 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new IoAdapter(app));
 
-  await app.listen(3000);
+  const port = process.env.APP_PORT || 3000;
+  await app.listen(port);
 }
 bootstrap();

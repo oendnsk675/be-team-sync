@@ -5,6 +5,8 @@ import {
   IsArray,
   ArrayNotEmpty,
   IsBoolean,
+  IsString,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateTaskDto {
@@ -17,21 +19,27 @@ export class CreateTaskDto {
   @IsInt({ each: true })
   assignees?: number[];
 
-  @IsInt()
+  @IsString()
+  @IsNotEmpty()
   title: string;
 
-  @IsInt()
-  description: string;
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  column: string;
 
   @IsBoolean()
   @IsOptional()
-  status: boolean;
+  status?: boolean;
 
   @IsDate()
   @IsOptional()
-  startAt: Date;
+  startAt?: Date;
 
   @IsDate()
   @IsOptional()
-  endAt: Date;
+  endAt?: Date;
 }

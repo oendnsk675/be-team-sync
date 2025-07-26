@@ -119,6 +119,13 @@ export class TeamService {
     };
   }
 
+  async updateImageTeam(id: number, filename: string) {
+    await this.teamRepository.update(id, { image: filename });
+    return {
+      message: 'Successfull update data team',
+    };
+  }
+
   async remove(teamId: number) {
     await this.teamRepository.delete({ team_id: teamId });
 

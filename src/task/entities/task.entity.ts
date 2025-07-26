@@ -1,5 +1,4 @@
 import { Project } from 'src/project/entities/project.entity';
-import { Team } from 'src/team/entities/team.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
@@ -24,11 +23,14 @@ export class Task {
   @Column({ name: 'title', type: 'varchar' })
   title: string;
 
-  @Column({ name: 'description', type: 'text' })
+  @Column({ name: 'description', type: 'text', default: '' })
   description: string;
 
   @Column({ type: 'boolean', default: false })
   status: boolean;
+
+  @Column({ name: 'column', type: 'varchar' })
+  column: string;
 
   @Column({ name: 'start_at', type: 'timestamp', default: null })
   startAt: Date;

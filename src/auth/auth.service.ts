@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UserRepository } from 'src/user/user.repository';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { SignupResponseDto } from './dto/signup-response.dto';
-import { SignInDto } from './dto/signin.dto';
-import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserRepository } from 'src/user/user.repository';
 import { SignInResponseDto } from './dto/signin-response.dto';
+import { SignInDto } from './dto/signin.dto';
+import { SignupResponseDto } from './dto/signup-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,8 +21,6 @@ export class AuthService {
   }
 
   async signUp(createAuthDto: CreateUserDto): Promise<SignupResponseDto> {
-    console.log(createAuthDto.password);
-
     const hashedPassword = await this.hashPassword(createAuthDto.password);
     const data = {
       ...createAuthDto,
@@ -37,8 +35,7 @@ export class AuthService {
   }
 
   async signIn(createAuthDto: SignInDto): Promise<SignInResponseDto> {
-    const user = await this.userRepository.getUser(createAuthDto.username);
-    console.log(user);
+    const user = await this.userRepository.getUser(createAuthDto.email);
 
     if (!user) {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
@@ -48,6 +45,7 @@ export class AuthService {
       createAuthDto.password,
       user.password,
     );
+    console.log(user, userValid, createAuthDto, user.password);
 
     if (!userValid) {
       throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);

@@ -6,9 +6,10 @@ import { Project } from './entities/project.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Team } from 'src/team/entities/team.entity';
 import { TeamRepository } from 'src/team/team.repository';
+import { Task } from 'src/task/entities/task.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project, User, Team])],
+  imports: [TypeOrmModule.forFeature([Project, User, Team, Task])],
   controllers: [ProjectController],
   providers: [ProjectService, TeamRepository],
 })

@@ -7,6 +7,8 @@ import { UserRepository } from './user.repository';
 import { Task } from 'src/task/entities/task.entity';
 import { UserTeamRepository } from 'src/user_team/user_team.repository';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Task, UserTeam])],

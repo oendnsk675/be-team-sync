@@ -6,8 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  Request,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -19,14 +19,24 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  @Get(':project_id/tasks')
+  findTask(@Param('project_id') project_id: number) {
+    return this.projectService.findTask(+project_id);
+  }
+
   @Post()
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectService.create(createProjectDto);
   }
 
-  @Get()
-  findAll(@Request() req) {
-    return this.projectService.findAll(req.user.user_id);
+  @Get(':team_id')
+  findAll(
+    @Param('team_id') team_id: number,
+    @Query('status') status: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.projectService.findAll(team_id, status, page, limit);
   }
 
   @Get(':id')

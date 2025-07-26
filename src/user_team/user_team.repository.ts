@@ -14,7 +14,7 @@ export class UserTeamRepository extends Repository<UserTeam> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
   async createUserTeam(payload: CreateUserTeamsDto) {
-    return await this.repository.save(payload.teams);
+    return await this.repository.insert(payload.teams);
   }
 
   async removeUserTeam({ user_id, team_id }: RemoveUserTeamDto) {
