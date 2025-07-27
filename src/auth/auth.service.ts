@@ -35,17 +35,18 @@ export class AuthService {
   }
 
   async signIn(createAuthDto: SignInDto): Promise<SignInResponseDto> {
-    const user = await this.userRepository.getUser(createAuthDto.email);
-
+    const user = await this.userRepository.findOne({
+      where: { email: createAuthDto.email },
+    });
+    console.log(user, createAuthDto);
     if (!user) {
-      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
     const userValid = await bcrypt.compare(
       createAuthDto.password,
       user.password,
     );
-    console.log(user, userValid, createAuthDto, user.password);
 
     if (!userValid) {
       throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
