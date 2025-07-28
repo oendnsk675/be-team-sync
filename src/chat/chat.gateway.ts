@@ -56,16 +56,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.data.user = user;
 
       const teams = await this.chatService.getUserTeams(user.data.user_id);
-      console.log({ teams, user_id: user.data.user_id });
+      // console.log({ teams, user_id: user.data.user_id });
 
       teams.forEach((team) => {
         client.join(`team_${team.team_id}`);
-        console.log(`Client ${client.id} joined room team_${team.team_id}`);
+        // console.log(`Client ${client.id} joined room team_${team.team_id}`);
       });
 
-      const socketsInRoom = await this.server.in('team_1').fetchSockets();
+      // const socketsInRoom = await this.server.in('team_2').fetchSockets();
 
-      console.log(socketsInRoom.map((s) => s.id));
+      // console.log(socketsInRoom.map((s) => s.id));
 
       await this.userService.updateStatus(user.data.user_id, true);
     } catch (error) {
@@ -105,6 +105,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           fullname: user.data.fullname,
         };
       });
+
+    const socketsInRoom = await this.server.in(room).fetchSockets();
+
+    console.log(socketsInRoom.map((s) => s.id));
 
     if (!user) {
       throw new UnauthorizedException('User source message not found');
