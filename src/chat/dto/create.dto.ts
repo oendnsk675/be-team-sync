@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Chat } from '../entities/chat.entity';
 
 export class CreateMessageDto {
@@ -13,6 +13,10 @@ export class CreateMessageDto {
   @IsOptional()
   @IsString()
   message: string;
+
+  @IsNotEmpty()
+  @IsString()
+  iv: string;
 
   @IsOptional()
   @IsNumber()

@@ -1,12 +1,12 @@
 import { Task } from 'src/task/entities/task.entity';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('teams')
@@ -25,6 +25,9 @@ export class Team {
 
   @OneToMany(() => UserTeam, (userTeam) => userTeam.team)
   userTeams: UserTeam[];
+
+  @Column({ type: 'text', nullable: false })
+  gck: string;
 
   @OneToMany(() => Task, (task) => task.taskId)
   tasks: Task[];

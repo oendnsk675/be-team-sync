@@ -1,13 +1,13 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-} from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { Team } from 'src/team/entities/team.entity';
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('user_teams')
 export class UserTeam {
@@ -19,6 +19,9 @@ export class UserTeam {
 
   @Column()
   team_id: number;
+
+  @Column({ type: 'text', nullable: false })
+  encrypted_gck: string;
 
   @Column({ type: 'varchar' })
   role: string;

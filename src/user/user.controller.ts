@@ -1,24 +1,27 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  UseGuards,
-  Request,
+  Patch,
+  Post,
   Query,
-  UseInterceptors,
+  Request,
   UploadedFile,
-  BadRequestException,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { SetPublicKeyDto } from './dto/set-public-key.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { UserService } from './user.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
@@ -33,6 +36,18 @@ export class UserController {
   @Get('profile')
   async findProfile(@Request() req) {
     return await this.userService.findOne(req.user.user_id);
+  }
+
+  @Post('me/public-key')
+  @UseGuards(JwtAuthGuard)
+  async setPublicKey(@CurrentUser() user: User, @Body() dto: SetPublicKeyDto) {
+    return this.userService.setPublicKey(user.user_id, dto.public_key);
+  }
+
+  @Get('me/public-key')
+  @UseGuards(JwtAuthGuard)
+  async getPublicKey(@CurrentUser() user: User) {
+    return this.userService.getPublicKey(user.user_id);
   }
 
   @Patch('avatar')

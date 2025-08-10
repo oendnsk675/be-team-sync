@@ -1,14 +1,14 @@
 import { Type } from 'class-transformer';
 import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsNotEmpty,
   IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
   ValidateNested,
 } from 'class-validator';
 
-class CreateUserTeamDto {
+export class CreateUserTeamDto {
   @IsNumber()
   @IsNotEmpty()
   user_id: number;
@@ -19,6 +19,9 @@ class CreateUserTeamDto {
 
   @IsString()
   role: string;
+
+  @IsString()
+  encrypted_key: string;
 
   @IsOptional()
   joined_at?: Date;

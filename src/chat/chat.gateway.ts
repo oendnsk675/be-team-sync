@@ -106,18 +106,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         };
       });
 
-    const socketsInRoom = await this.server.in(room).fetchSockets();
-
-    console.log(socketsInRoom.map((s) => s.id));
-
     if (!user) {
       throw new UnauthorizedException('User source message not found');
     }
 
-    // // Save message to the database
     const message = await this.chatService.saveMessage(data);
 
-    // // Emit message to the specific team room
     this.server
       .to(room)
       .emit('message', { user, createdAt: message.createdAt, ...data });

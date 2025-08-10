@@ -2,12 +2,12 @@ import { Task } from 'src/task/entities/task.entity';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
 import {
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+  Entity,
   ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -35,6 +35,9 @@ export class User {
 
   @Column({ default: false })
   status: boolean;
+
+  @Column({ type: 'text', nullable: true })
+  public_key: string;
 
   @OneToMany(() => UserTeam, (userTeam) => userTeam.user)
   userTeams: UserTeam[];

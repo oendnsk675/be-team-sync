@@ -4,10 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UserRepository } from './user.repository';
+import { UserTeamRepository } from 'src/user_team/user_team.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserTeamRepository } from 'src/user_team/user_team.repository';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
@@ -133,5 +133,19 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} auth`;
+  }
+
+  async setPublicKey(userId: number, publicKey: string) {
+    const user = await this.userRepository.findOneBy({ user_id: userId });
+    if (!user) throw new NotFoundException('User not found');
+
+    user.public_key = publicKey;
+    await this.userRepository.save(user);
+    return { message: 'Public key saved' };
+  }
+
+  async getPublicKey(userId: number) {
+    const user = await this.userRepository.findOneBy({ user_id: userId });
+    return user.public_key;
   }
 }

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTeamDto {
   @IsString()
@@ -13,4 +13,9 @@ export class CreateTeamDto {
   @IsString()
   @IsNotEmpty()
   image?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  gck?: string;
 }

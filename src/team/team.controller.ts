@@ -1,27 +1,27 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  Request,
-  UseGuards,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
-  UseInterceptors,
+  Request,
   UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { TeamService } from './team.service';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
-import { CreateUserTeamsDto } from 'src/user_team/dto/create-user_team.dto';
-import { UserTeamService } from 'src/user_team/user_team.service';
-import { RemoveUserTeamDto } from 'src/user_team/dto/remove-user_team.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CreateUserTeamDto } from 'src/user_team/dto/create-user_team.dto';
+import { RemoveUserTeamDto } from 'src/user_team/dto/remove-user_team.dto';
+import { UserTeamService } from 'src/user_team/user_team.service';
+import { CreateTeamDto } from './dto/create-team.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
+import { TeamService } from './team.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('team')
@@ -37,7 +37,7 @@ export class TeamController {
   }
 
   @Post('member/invite')
-  invite(@Body() payload: CreateUserTeamsDto) {
+  invite(@Body() payload: CreateUserTeamDto) {
     return this.userTeamService.create(payload);
   }
 

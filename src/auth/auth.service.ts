@@ -38,7 +38,6 @@ export class AuthService {
     const user = await this.userRepository.findOne({
       where: { email: createAuthDto.email },
     });
-    console.log(user, createAuthDto);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
@@ -60,6 +59,7 @@ export class AuthService {
       refresh_token: this.jwtService.sign(payload, {
         expiresIn: process.env.JWT_REFRESH_EXPIRED,
       }),
+      user,
     };
 
     return {

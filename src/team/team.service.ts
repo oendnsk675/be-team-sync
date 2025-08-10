@@ -4,34 +4,50 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
-import { TeamRepository } from './team.repository';
-import { GetAllResponse } from './dto/get-all-response.dto';
-import { Team } from './entities/team.entity';
 import { UserRole } from 'src/common/enums/user-role';
-import { EntityManager, In } from 'typeorm';
+import { encryptGCKWithPublicKey, generateGCK } from 'src/common/utils/crypto';
+import { UserRepository } from 'src/user/user.repository';
 import { UserTeam } from 'src/user_team/entities/user_team.entity';
 import { UserTeamRepository } from 'src/user_team/user_team.repository';
+import { EntityManager, In } from 'typeorm';
+import { CreateTeamDto } from './dto/create-team.dto';
+import { GetAllResponse } from './dto/get-all-response.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
+import { Team } from './entities/team.entity';
+import { TeamRepository } from './team.repository';
 
 @Injectable()
 export class TeamService {
   constructor(
     private readonly teamRepository: TeamRepository,
     private readonly userTeamRepository: UserTeamRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   async create(createTeamDto: CreateTeamDto, user_id: number): Promise<any> {
     return await this.teamRepository.manager.transaction(
       async (manager: EntityManager) => {
         try {
-          const team = await manager.save(Team, createTeamDto);
+          const rawGck = generateGCK();
+          const gckBase64 = rawGck.toString('base64');
+          const team = await manager.save(Team, {
+            ...createTeamDto,
+            gck: gckBase64,
+          });
 
+          const publicKey = await this.userRepository
+            .findOneBy({ user_id })
+            .then((user) => user.public_key);
+          const encrypted_gck = await encryptGCKWithPublicKey(
+            rawGck,
+            publicKey,
+          );
           const role: string = UserRole.AUTHOR;
           const userTeamData = {
             user_id,
             team_id: team.team_id,
             role,
+            encrypted_gck,
           };
 
           await manager.save(UserTeam, userTeamData);
@@ -41,6 +57,8 @@ export class TeamService {
             data: team,
           };
         } catch (error) {
+          console.log(error);
+
           throw new BadRequestException('Failed to create team and user team');
         }
       },
